@@ -1,0 +1,22 @@
+Set-ClientAccessServer -Identity "mbx1" –AutodiscoverServiceInternalURI https://nlb.nwtraders.msft/autodiscover/autodiscover.xml
+Set-WebServicesVirtualDirectory -Identity "mbx1\EWS (Default Web Site)" –InternalUrl  https://nlb.nwtraders.msft/EWS/Exchange.asmx
+Set-OABVirtualDirectory -Identity “mbx1\OAB (Default Web Site)” -InternalURL https://nlb.nwtraders.msft/OAB
+Enable-OutlookAnywhere -Server mbx1 -ExternalHostname “nlb.nwtraders.msft” -ClientAuthenticationMethod “NTLM”
+Set-ActiveSyncVirtualDirectory -Identity “mbx1\Microsoft-Server-ActiveSync (Default Web Site)” -InternalURL https://nlb.nwtraders.msft/Microsoft-Server-Activesync
+
+
+1-->Get-ClientAccessServer | select identity, AutoDiscoverServiceInternalUri, AutoDiscoverServiceExternalUri
+FIX 1 ->	Get-ClientAccessServer -identity ESDRCASHUB | Set-ClientAccessServer -AutoDiscoverServiceInternalUri "https://autodiscover.emiratessteel.com/autodiscover/autodiscover.xml"
+			Changed ESDRCASHUB -> AutoDiscoverServiceInternalUri from https://esdrcashub.eisf.co.ae/Autodiscover/Autodiscover.xml to https://autodiscover.emiratessteel.com/autodiscover/autodiscover.xml
+
+2-->Get-WebServicesVirtualDirectory | select identity, InternalUrl, ExternalUrl
+FIX 2A ->	Get-WebServicesVirtualDirectory -identity "EISF090\EWS (Default Web Site)" | Set-WebServicesVirtualDirectory -InternalUrl "https://mail.emiratessteel.com/EWS/exchange.asmx"
+			Changed EISF090 -> InternalUrl from to https://eisf090.eisf.co.ae/EWS/Exchange.asmx to https://mail.emiratessteel.com/EWS/exchange.asmx
+FIX 2B ->	Get-WebServicesVirtualDirectory -identity "EISF090\EWS (Default Web Site)" | Set-WebServicesVirtualDirectory -ExternalUrl "https://mail.emiratessteel.com/EWS/exchange.asmx"
+			Added to EISF090 -> ExternalUrl the value "https://mail.emiratessteel.com/EWS/exchange.asmx"
+
+
+3-->Get-OABVirtualDirectory | select identity, InternalUrl, ExternalUrl
+4-->Get-OutlookAnywhere | select identity, internalhostname, externalhostname, ClientAuthenticationMethod
+5-->Get-ActiveSyncVirtualDirectory | select identity, InternalUrl, ExternalUrl
+

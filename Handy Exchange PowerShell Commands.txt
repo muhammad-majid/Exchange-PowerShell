@@ -1,0 +1,214 @@
+----Get all ActiveSync devices associated to a specific user----
+Get-ActiveSyncDevice -Mailbox $MailboxAlias | select FriendlyName, DeviceOS, DeviceType, DeviceModel, Identity
+Get-MobileDevice -Mailbox $MailboxAlias | select FriendlyName, DeviceOS, DeviceType, DeviceModel, Identity
+
+----Delete all activeSync devices associated to a specific user----
+Get-ActiveSyncDevice -Mailbox $MailboxAlias | Remove-ActiveSyncDevice -WarningAction SilentlyContinue
+Get-MobileDevice -Mailbox $MailboxAlias | Remove-ActiveSyncDevice -WarningAction SilentlyContinue
+
+----Deremolete specific activeSync device associated to a specific user----	
+Remove-ActiveSyncDevice -identity $identity -WarningAction SilentlyContinue
+Remove-ActiveSyncDevice -identity $identity -WarningAction SilentlyContinue
+
+----Get attributes of all the Exchange servers in the Exchange organization.----	
+Get-ExchangeServer
+
+----Export Contacts of a mailbox to .pst file----
+New-MailboxExportRequest -Mailbox $MailboxAlias -IncludeFolders "#Contacts#" -excludedumpster -filepath \\eisf090\Mailbox-Exports\filename.pst
+Get-MailboxExportRequest | Get-MailboxExportRequestStatistics
+
+----Export Emails of a mailbox to .pst file----
+New-MailboxExportRequest –Mailbox $MailboxAlias –filepath \\eisf090\Mailbox-Exports\filename.pst
+Get-MailboxExportRequest | Get-MailboxExportRequestStatistics
+
+----Clear completed Mailbox Export Requests----
+Get-MailboxExportRequest -Status Completed | Remove-MailboxExportRequest
+
+----Get all databases----
+Get-MailboxDatabase
+
+----Get all databases on a specific server----
+Get-MailboxDatabase -Server $ServerName
+
+----Get which database a particular mailbox belongs to----
+Get-mailbox -identity $MailboxAlias | fl database
+
+----Get all mailboxes and their respective database----
+Get-Mailbox | Sort database, name | Format-Table name, database
+
+----Get all mailboxes from a specific database----
+Get-Mailbox -Database $DatabaseName
+
+----Get all mailboxes from a specific server----
+Get-Mailbox -Server $ServerName
+
+----Move all mailboxes from 1 Database to another----
+Get-Mailbox -Database $SourceDBName -ResultSize Unlimited | New-MoveRequest -TargetDatabase $TargetDBName
+Get-MoveRequestStatistics -MoveRequestQueue “Target Database Name”
+
+----Clear completed Mailbox MOVE Requests----
+Get-MoveRequest -MoveStatus Completed | Remove-MoveRequest
+
+----Disable a mailbox and delete it (without deleting the AD Account)----
+Disable-Mailbox -identity $UserName
+Remove-StoreMailbox -Database $MY_DATABASE -Identity $MY_USER -MailboxState SoftDeleted
+
+----Get a list of all mailbox searches----
+Get-MailboxSearch -ResultSize "unlimited"
+
+----Get properties of a particular mailbox search----
+Get-MailboxSearch $SearchName | FL
+
+----Get audit logging configuration of a specific user
+Get-Mailbox $MailboxAlias | fl *audit*
+
+----Get mailbox Audit Logging Report a particular mailbox by hours and LogonType----
+Get-MailboxAuditLoggingReport_mmajid.ps1 -Mailbox $MailboxAlias -Hours $NumberOfHours -LogonTypes [Owner or Delegate or Admin]
+
+----Get all users to whom a specific user has granted SendOnBehalfOf permissions----
+Get-Mailbox $MailboxAlias | Select Alias, @{Name='GrantSendOnBehalfTo';Expression={[string]::join(";", ($_.GrantSendOnBehalfTo))}}
+
+----Get all users who have granted SendOnBehalfOf permissions to someone----
+Get-Mailbox -Filter {GrantSendOnBehalfTo -ne $Null} |Select Alias, @{Name='GrantSendOnBehalfTo';Expression={[string]::join(";", ($_.GrantSendOnBehalfTo))}}
+
+----List all mailboxes to which a particular user has Full Access permissions----
+Get-Mailbox | Get-MailboxPermission -User $MailboxAlias -ResultSize 10
+
+----List all mailboxes to which a user has Send As permissions----
+Get-Mailbox | Get-RecipientPermission -Trustee $MailboxAlias
+
+----List all mailboxes to which a particular security principal has Send on behalf of permissions----
+Get-Mailbox | ? {$_.GrantSendOnBehalfTo -match "$MailboxAlias"}
+
+----List all permissions others have on a specific user mailbox----
+Get-MailboxPermission -identity $MailboxAlias
+Get-MailboxPermission -identity $MailboxAlias | Export-Csv -NoTypeInformation mailboxpermissions.csv
+
+----List of all mailboxes where other users have permissions to access them----
+Get-Mailbox -ResultSize Unlimited | Get-MailboxPermission | where {$_.user.tostring() -ne "NT AUTHORITY\SELF" -and $_.IsInherited -eq $false} | Select Identity,User,@{Name='Access Rights';Expression={[string]::join(', ', $_.AccessRights)}} | Export-Csv -NoTypeInformation mailboxpermissions.csv
+
+----Remove all Permission and Access Rights of UserAlpha that he has on Mailbox of UserBeta----
+Remove-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -InheritanceType All
+
+----Add / Grant Permission and Access Rights to UserAlpha on Mailbox of UserBeta----
+Add-MailboxPermission -Identity $UserBeta -User UserAlpha -AccessRights FullAccess -InheritanceType All
+
+----Add / Grant Send as permission to UserSecretary on Mailbox of UserManager----
+Add-RecipientPermission $UserManager -Trustee $UserSecretary -AccessRights SendAs -Confirm:$False
+
+----Add / Grant Send on behalf to UserSecretary on Mailbox of UserManager----
+Set-Mailbox -Identity $UserManager -GrantSendOnBehalfTo $UserSecretary
+
+----Get active CAS connections count on all CAS servers----
+Get-Active-Cas-Connections-V5.ps1
+
+----Get list of all ActiveSync Throttling Policies----
+Get-ThrottlingPolicy | Select Identity
+
+----Get the name of ActiveSync Throttling Policy applied to a specific user----
+Get-Mailbox $MailboxAlias | select ThrottlingPolicy
+
+----Get all mailboxes using a specific ActiveSync Throttling Policy----
+Get-Mailbox | where-object {$_.ThrottlingPolicy -eq $policy.Identity}
+
+----Change ActiveSync Throttling Policy for a specific user----
+Get-Mailbox $MailboxAlias | Set-Mailbox –ThrottlingPolicy $ThrottlingPolicyName
+
+----Get all users of a certain ActiveSync Throttling Policy, and assign them an alternate policy----
+Get-Mailbox -ResultSize Unlimited | where-object {$_.ThrottlingPolicy -eq $null} | Select SamAccountName | Export-Csv -NoTypeInformation 'C:\ShellWorkingFolder\nullThrottlingPolicyMailboxes.csv'
+Import-Csv 'C:\ShellWorkingFolder\nullThrottlingPolicyMailboxes.csv' | ForEach { Get-Mailbox -Identity $_.ColumnName |   Set-Mailbox –ThrottlingPolicy $ThrottlingPolicyName }
+
+----Check mailbox's readiness to move to a new database----
+New-MoveRequest -Identity $MailboxAlias -TargetDatabase $DatabaseName -WhatIf
+
+----Move a mailbox to another database----
+New-MoveRequest -Identity $MailboxAlias -TargetDatabase $DatabaseName
+
+----Get message tracking status on an email for troubleshooting purposes----
+Get-TransportServer | Get-MessageTrackingLog -sender $SenderEmail -Recipients $RecepientEmail -MessageSubject $EmailSubject
+
+----Get message tracking detailed information on an email for troubleshooting purposes----
+Get-TransportServer | Get-MessageTrackingLog -sender $SenderEmail -Recipients $RecepientEmail -MessageSubject $EmailSubject | fl *
+
+----Give Send As Permissions allowing UserX to send as UserY----
+Add-ADPermission -Identity UserX -User UserY -AccessRights ExtendedRight -ExtendedRights "Send As"
+
+----Get Database and Log file paths----
+Get-MailboxDatabase | fl Name, EdbFilePath, LogFolderPath
+
+----Remove Replicated copies of Database----
+Remove-MailboxDatabaseCopy -Identity $DBName -Confirm:$False
+
+----Move Database and Log files to different location----
+Move-DatabasePath $DBName -EdbFilePath 'D:\EX-Databases\DB1EX2016EISF126\DB1EX2016EISF126.edb' -LogFolderPath 'E:\EX-Logs\DB1EX2016EISF126'
+
+----Check if an email address exists in the system----
+get-recipient -filter {emailaddresses -like "*user@domain.com*"}
+
+----Hide mailbox address from address lists----
+Set-Mailbox -Identity $MailboxAlias -HiddenFromAddressListsEnabled $true
+
+----Set Out of Office Auto Reply----
+Set-MailboxAutoReplyConfiguration -Identity $MailboxAlias -AutoReplyState Enabled -InternalMessage "Internal auto-reply message." -ExternalMessage "External auto-reply message."
+Set-MailboxAutoReplyConfiguration -Identity $MailboxAlias -AutoReplyState Scheduled -StartTime "7/10/2015 08:00:00" -EndTime "7/15/2015 17:00:00" -InternalMessage "Internal auto-reply message" -ExternalMessage "External auto-reply message."
+Get-MailboxAutoReplyConfiguration -Identity $MailboxAlias
+
+----Connect to Exchange O365 Administration using Powershell----
+$UserCredential = Get-Credential
+$Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $UserCredential -Authentication  Basic -AllowRedirection
+Import-PSSession $Session
+//do your work.....
+Get-PSSession
+Remove-PSSession $SessionID // or the session id
+
+----Change display name and others on Exchange O365 Powershell----
+Get-Mailbox $MailboxAlias | Set-Mailbox -Name "Sunset Room" -Alias "sunsetroom" -DisplayName "Sunset Room" -SamAccountName sunsetroom -UserPrincipalName sunsetroom@exchangeserverpro.net
+Get-User $userAlias | Set-User -FirstName "Sunset Room"
+
+----Get email forward status on single mailbox----
+Get-Mailbox $User1 | FL DeliverToMailboxAndForward, ForwardingAddress, ForwardingSmtpAddress
+
+----Forward all emails to another email address keeping a local copy as well----
+Set-Mailbox $User1 -ForwardingAddress $User2@domain.com -DeliverToMailboxAndForward $true
+
+----Forward all emails to another email address without keeping a local copy----
+Set-Mailbox $User1 -ForwardingAddress $User2@domain.com -DeliverToMailboxAndForward $false
+
+----Disable email forwarding----
+Set-Mailbox $userAlias -ForwardingAddress $Null
+
+----Find all Recipients (Display list) with ADMIN Forwarding or USER Forwarding----
+Get-Mailbox -ResultSize Unlimited | Where {($_.ForwardingAddress -ne $Null) -or ($_.ForwardingsmtpAddress -ne $Null)} | Select Name, ForwardingAddress, ForwardingsmtpAddress, DeliverToMailboxAndForward
+
+----Grant Folder permissions as Owner role to Ed on the Marketing folder in Ayla's mailbox.----
+Add-MailboxFolderPermission -Identity ayla@contoso.com:\Marketing -User ed@contoso.com -AccessRights Owner
+
+----Modify Folder permissions as Editor role to Ed on the Marketing folder in Ayla's mailbox.----
+Set-MailboxFolderPermission -Identity ayla@contoso.com:\Marketing -User ed@contoso.com -AccessRights Editor
+
+----Get a list of all distribution groups---
+Get-DistributionGroup
+
+----Get a list of all memebers of a distribution group----
+Get-DistributionGroupMember -Identity "$DGName"
+
+----Get a list of all memebers of a distribution group and export it to CSV----
+Get-DistributionGroupMember -Identity "$DGName" | Export-Csv -NoTypeInformation 'C:\Scripts\DGMembers.csv'
+
+----Get a list of all Distribution Groups a user is a memeber of----
+$VarDistributionGroups = Get-DistributionGroup | where { (Get-DistributionGroupMember $_.Name | foreach {$_.PrimarySmtpAddress}) -contains $Alias}
+$VarDistributionGroups
+
+----Add member to distribution group----
+Add-DistributionGroupMember -Identity "$DGName" -Member $Alias
+
+----Remove member from a distribution group----
+Remove-DistributionGroupMember -Identity "$DGName" -Member $Alias
+
+----Get all soft deleted mailboxes and their respective GUIDs----
+Get-Mailbox -SoftDeletedMailbox
+et-MailboxDatabase | Get-MailboxStatistics | where {$_.DisconnectReason -ne $null} | ft displayname,database,disconnectreason –auto
+
+----Connect a soft deleted mailbox to an existing AD user (with no mailbox)----
+Connect-Mailbox -Identity “Mailbox Name” -Database “database name” -User AD User Name
+

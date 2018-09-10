@@ -1,0 +1,17 @@
+----Apply new ActiveSync policy 'IT-Tesing' to IT----
+Get-CASMailbox -identity "mmajid" | Set-CASMailbox -ActiveSyncMailboxPolicy(Get-ActiveSyncMailboxPolicy "IT-Testing").Identity
+Get-DistributionGroupMember IT | Set-CASMailbox -ActiveSyncMailboxPolicy(Get-ActiveSyncMailboxPolicy "IT-Testing").Identity
+
+
+----Get list of all current ActiveSync devices and their owners----
+$EASMailboxes = Get-CASMailbox -ResultSize unlimited -Filter {HasActiveSyncDevicePartnership -eq $True -and DisplayName -notlike "CAS_{*"} | Get-Mailbox
+$EASMailboxes | Select-Object SamAccountName, DisplayName, PrimarySMTPAddress, @{Name="EASDeviceCount";Expression={(Get-ActiveSyncDevice -Mailbox $_.Identity).Count}} | Export-CSV .\EASMailboxes.csv -NoTypeInformation
+
+
+----Delete stale ActiveSync partnerships older than 30 days----
+$DevicesToRemove = Get-ActiveSyncDevice -result unlimited | Get-ActiveSyncDeviceStatistics | where {$_.LastSuccessSync -le (Get-Date).AddDays("-30")}
+$DevicesToRemove | foreach-object {Remove-ActiveSyncDevice ([string]$_.Guid) -confirm:$false}
+
+----Set EASMaxDevices and EasMaxConcurrency to 2
+Get-ThrottlingPolicy Default*| fl Name,EASMaxDevices,EASMaxConcurrency
+Set-ThrottlingPolicy Default* -EASMaxDevices 2  -EASMaxConcurrency 2

@@ -212,3 +212,5 @@ et-MailboxDatabase | Get-MailboxStatistics | where {$_.DisconnectReason -ne $nul
 ----Connect a soft deleted mailbox to an existing AD user (with no mailbox)----
 Connect-Mailbox -Identity “Mailbox Name” -Database “database name” -User AD User Name
 
+----Disable tentative meeting requests----
+Set-CalendarProcessing -Identity $Alias -AddNewRequestsTentatively:$false

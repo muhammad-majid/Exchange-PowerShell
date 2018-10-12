@@ -50,8 +50,12 @@ Get-MoveRequestStatistics -MoveRequestQueue “Target Database Name”
 Get-MoveRequest -MoveStatus Completed | Remove-MoveRequest
 
 ----Disable a mailbox and delete it (without deleting the AD Account)----
-Disable-Mailbox -identity $UserName
+Disable-Mailbox -identity $UserNamec
 Remove-StoreMailbox -Database $MY_DATABASE -Identity $MY_USER -MailboxState SoftDeleted
+
+----Permanently delete a disconnected mailbox that is in softdeleted state----
+Get-MailboxStatistics -Database “MailboxDatabase” | Where { $_.DisconnectDate -ne $null } | select DisplayName, DisconnectDate, TotalItemSize, TotalDeletedItemSize, mailboxGuid
+Remove-StoreMailbox -Database $Database -Identity $guid -MailboxState Disabled
 
 ----Get a list of all mailbox searches----
 Get-MailboxSearch -ResultSize "unlimited"

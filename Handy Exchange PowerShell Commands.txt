@@ -6,7 +6,7 @@ Get-MobileDevice -Mailbox $MailboxAlias | select FriendlyName, DeviceOS, DeviceT
 Get-ActiveSyncDevice -Mailbox $MailboxAlias | Remove-ActiveSyncDevice -WarningAction SilentlyContinue
 Get-MobileDevice -Mailbox $MailboxAlias | Remove-ActiveSyncDevice -WarningAction SilentlyContinue
 
-----Deremolete specific activeSync device associated to a specific user----	
+----Delete specific activeSync device associated to a specific user----	
 Remove-ActiveSyncDevice -identity $identity -WarningAction SilentlyContinue
 Remove-ActiveSyncDevice -identity $identity -WarningAction SilentlyContinue
 

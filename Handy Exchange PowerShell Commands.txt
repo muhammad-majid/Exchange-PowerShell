@@ -218,3 +218,7 @@ Connect-Mailbox -Identity “Mailbox Name” -Database “database name” -User
 
 ----Disable tentative meeting requests----
 Set-CalendarProcessing -Identity $Alias -AddNewRequestsTentatively:$false
+
+----List a count of folders in a mailbox----
+(Get-MailboxFolderStatistics -Identity <UPN>).Count
+

@@ -195,8 +195,6 @@ Get-DistributionGroup
 
 ----Get a list of all memebers of a distribution group----
 Get-DistributionGroupMember -Identity "$DGName"
-
-----Get a list of all memebers of a distribution group and export it to CSV----
 Get-DistributionGroupMember -Identity "$DGName" | Export-Csv -NoTypeInformation 'C:\Scripts\DGMembers.csv'
 
 ----Get a list of all Distribution Groups a user is a memeber of----

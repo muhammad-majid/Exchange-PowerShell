@@ -13,5 +13,6 @@ Import-CSV $newpath | ForEach-Object{
     "Iteration Start for $($mySamAccountName) ------------------------------------" | Out-File $log -append
     $VarDistributionGroups = Get-DistributionGroup | where { (Get-DistributionGroupMember $_.Name | foreach {$_.PrimarySmtpAddress}) -contains $mySamAccountName}
     $($VarDistributionGroups) | Out-File $log -append
+    
     "Iteration End for $($mySamAccountName) --------------------------------------" | Out-File $log -append
 }

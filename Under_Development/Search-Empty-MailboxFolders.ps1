@@ -12,6 +12,35 @@
 # SAMPLES, EVEN IF MICROSOFT HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. BECAUSE SOME STATES DO NOT ALLOW THE EXCLUSION OR LIMITATION
 # OF LIABILITY FOR CONSEQUENTIAL OR INCIDENTAL DAMAGES, THE ABOVE LIMITATION MAY NOT APPLY TO YOU.
 
+<#
+
+This is a PowerShell script that will report on empty folders within a mailbox.  It can export the report to a CSV file, and also it can delete empty folders.  The script requires the EWS Managed API to be installed on the machine from which it is run.
+
+Example 1
+
+Create a report for each mailbox (each mailbox will have its own report).  This needs to be run from an Exchange PowerShell Console (or a standard PowerShell console with an Exchange session imported).  The account running this will need to be granted ApplicationImpersonation permissions to all mailboxes.
+
+$m = Get-Mailbox
+$m | ForEach-Object {
+     .\Search-EmptyFolders.ps1 –Mailbox $_.PrimarySmtpAddress -ReportToFile "c:\Temp\EmptyFolderReport-{0}.csv" -Impersonate
+}
+
+Example 2
+
+Delete all empty folders from your own mailbox (this would only work with an on-premises mailbox).  You will be prompted for every folder to confirm whether to delete it.
+
+.\Search-EmptyFolders.ps1 -Delete
+
+Example 3
+
+Delete all empty folders from your own mailbox (this would only work with an on-premises mailbox).    All folders will be deleted and there will be no user prompts to confirm.
+
+.\Search-EmptyFolders.ps1 -Delete -Force
+
+#>
+
+
+
 param (
 	[Parameter(Position=0,Mandatory=$False,HelpMessage="Specifies the mailbox to be accessed")]
 	[ValidateNotNullOrEmpty()]
@@ -54,22 +83,22 @@ param (
 	[Parameter(Mandatory=$False,HelpMessage="Whether we are using impersonation to access the mailbox")]
 	[switch]$Impersonate,
 	
-	[Parameter(Mandatory=$False,HelpMessage="EWS Url (if omitted, then autodiscover is used)")]	
+	[Parameter(Mandatory=$False,HelpMessage="EWS Url (if omitted, then autodiscover is used)")]
 	[string]$EwsUrl,
 	
-	[Parameter(Mandatory=$False,HelpMessage="Path to managed API (if omitted, a search of standard paths is performed)")]	
+	[Parameter(Mandatory=$False,HelpMessage="Path to managed API (if omitted, a search of standard paths is performed)")]
 	[string]$EWSManagedApiPath = "",
 	
-	[Parameter(Mandatory=$False,HelpMessage="Whether to ignore any SSL errors (e.g. invalid certificate)")]	
+	[Parameter(Mandatory=$False,HelpMessage="Whether to ignore any SSL errors (e.g. invalid certificate)")]
 	[switch]$IgnoreSSLCertificate,
 	
-	[Parameter(Mandatory=$False,HelpMessage="Whether to allow insecure redirects when performing autodiscover")]	
+	[Parameter(Mandatory=$False,HelpMessage="Whether to allow insecure redirects when performing autodiscover")]
 	[switch]$AllowInsecureRedirection,
 	
-	[Parameter(Mandatory=$False,HelpMessage="Log file - activity is logged to this file if specified")]	
+	[Parameter(Mandatory=$False,HelpMessage="Log file - activity is logged to this file if specified")]
 	[string]$LogFile = "",
 
-	[Parameter(Mandatory=$False,HelpMessage="Trace file - if specified, EWS tracing information is written to this file")]	
+	[Parameter(Mandatory=$False,HelpMessage="Trace file - if specified, EWS tracing information is written to this file")]
 	[string]$TraceFile
 )
 
@@ -873,7 +902,6 @@ if ($Credentials -ne $Null)
     }
 }
 
-  
 
 Write-Host ""
 

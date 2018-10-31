@@ -1,0 +1,1 @@
+Get-ADUser -LDAPFilter "(!msExchMailboxGuid=*)" | Export-Csv -NoTypeInformation 'C:\Scripts\non_mailboxed_users.csv'

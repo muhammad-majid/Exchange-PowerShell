@@ -97,6 +97,9 @@ Remove-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights Full
 ----Add / Grant Permission and Access Rights to UserAlpha on Mailbox of UserBeta----
 Add-MailboxPermission -Identity $UserBeta -User UserAlpha -AccessRights FullAccess -InheritanceType All
 
+----Add / Grant Permission and Access Rights to UserAlpha on Mailbox of UserBeta with automapping off----
+Add-MailboxPermission -Identity $UserBeta -User UserAlpha -AccessRights FullAccess -Automapping $false -InheritanceType All
+
 ----Add / Grant Send as permission to UserSecretary on Mailbox of UserManager----
 Add-RecipientPermission $UserManager -Trustee $UserSecretary -AccessRights SendAs -Confirm:$False
 

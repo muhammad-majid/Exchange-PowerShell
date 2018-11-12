@@ -13,6 +13,10 @@ Remove-ActiveSyncDevice -identity $identity -WarningAction SilentlyContinue
 ----Get attributes of all the Exchange servers in the Exchange organization.----	
 Get-ExchangeServer
 
+----------Get report on last logon times to mailboxes----------
+Get-ExchangeServer
+Get-MailboxStatistics -Server $ExchangeServerName | Select-object DisplayName, LastLogonTime | Export-CSV C:\Scripts\Logon-Stats-GG-HO-EX01.csv
+
 ----Export Contacts of a mailbox to .pst file----
 New-MailboxExportRequest -Mailbox $MailboxAlias -IncludeFolders "#Contacts#" -excludedumpster -filepath \\eisf090\Mailbox-Exports\filename.pst
 Get-MailboxExportRequest | Get-MailboxExportRequestStatistics

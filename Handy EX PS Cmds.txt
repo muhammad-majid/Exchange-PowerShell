@@ -110,6 +110,12 @@ Add-RecipientPermission $UserManager -Trustee $UserSecretary -AccessRights SendA
 ----Add / Grant Send on behalf to UserSecretary on Mailbox of UserManager----
 Set-Mailbox -Identity $UserManager -GrantSendOnBehalfTo $UserSecretary
 
+----Add / Grant Calendar Editor permissions to UserSecretary on Mailbox of UserManager----
+Add-MailboxFolderPermission -Identity $UserManager:\calendar -user $UserSecretary -AccessRights Editor
+
+----Remove / Revoke Calendar permissions to UserSecretary on Mailbox of UserManager----
+Remove-MailboxFolderPermission -Identity $UserManager:\calendar -User $UserSecretary
+
 ----Get active CAS connections count on all CAS servers----
 Get-Active-Cas-Connections-V5.ps1
 

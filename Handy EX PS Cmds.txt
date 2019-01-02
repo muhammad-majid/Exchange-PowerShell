@@ -233,3 +233,5 @@ Set-CalendarProcessing -Identity $Alias -AddNewRequestsTentatively:$false
 ----List a count of folders in a mailbox----
 (Get-MailboxFolderStatistics -Identity <UPN>).Count
 
+----'All Personnel' Dynaic Distribution Grup----
+((((RecipientType -eq 'UserMailbox') -and (-not(RecipientTypeDetailsValue -eq 'SharedMailbox')))) -and (-not(Name -like 'SystemMailbox{*')) -and (-not(Name -like 'CAS_{*')) -and (-not(RecipientTypeDetailsValue -eq 'MailboxPlan')) -and (-not(RecipientTypeDetailsValue -eq 'DiscoveryMailbox')) -and (-not(RecipientTypeDetailsValue -eq 'PublicFolderMailbox')) -and (-not(RecipientTypeDetailsValue -eq 'ArbitrationMailbox')) -and (-not(RecipientTypeDetailsValue -eq 'AuditLogMailbox')) -and (-not(RecipientTypeDetailsValue -eq 'AuxAuditLogMailbox')) -and (-not(RecipientTypeDetailsValue -eq 'SupervisoryReviewPolicyMailbox')))

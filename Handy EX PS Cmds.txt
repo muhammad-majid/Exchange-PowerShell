@@ -108,8 +108,7 @@ Add-MailboxPermission -Identity $UserBeta -User UserAlpha -AccessRights FullAcce
 Add-RecipientPermission $UserManager -Trustee $UserSecretary -AccessRights SendAs -Confirm:$False
 
 ----Add / Grant Send on behalf to UserSecretary on Mailbox of UserManager----
-Set-Mailbox -Identit
-y $UserManager -GrantSendOnBehalfTo $UserSecretary
+Set-Mailbox -Identity $UserManager -GrantSendOnBehalfTo $UserSecretary
 
 ----Get Calendar permissions others have on a certain mailbox----
 Get-MailboxFolderPermission –Identity $MailboxAias:\calendar

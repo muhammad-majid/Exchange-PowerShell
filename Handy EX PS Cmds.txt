@@ -82,7 +82,7 @@ Get-Mailbox -Filter {GrantSendOnBehalfTo -ne $Null} |Select Alias, @{Name='Grant
 ----List all mailboxes to which a particular user has Full Access permissions----
 Get-Mailbox | Get-MailboxPermission -User $MailboxAlias -ResultSize 10
 
-----List all mailboxes to which a user has Send As permissions----
+----List all mailboxes to which a particular user has Send As permissions----
 Get-Mailbox | Get-RecipientPermission -Trustee $MailboxAlias
 
 ----List all mailboxes to which a particular security principal has Send on behalf of permissions----
@@ -99,7 +99,7 @@ Get-Mailbox -ResultSize Unlimited | Get-MailboxPermission | where {$_.user.tostr
 Remove-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -InheritanceType All
 
 ----Add / Grant Permission and Access Rights to UserAlpha on Mailbox of UserBeta----
-Add-MailboxPermission -Identity $UserBeta -User UserAlpha -AccessRights FullAccess -InheritanceType All
+Add-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -InheritanceType All
 
 ----Add / Grant Permission and Access Rights to UserAlpha on Mailbox of UserBeta with automapping off----
 Add-MailboxPermission -Identity $UserBeta -User UserAlpha -AccessRights FullAccess -Automapping $false -InheritanceType All
@@ -163,7 +163,9 @@ Remove-MailboxDatabaseCopy -Identity $DBName -Confirm:$False
 Move-DatabasePath $DBName -EdbFilePath 'D:\EX-Databases\DB1EX2016EISF126\DB1EX2016EISF126.edb' -LogFolderPath 'E:\EX-Logs\DB1EX2016EISF126'
 
 ----Check if an email address exists in the system----
-get-recipient -filter {emailaddresses -like "*user@domain.com*"}
+1. Get-Recipient -filter {emailaddresses -like "*user@domain.com*"}
+2. Get-Mailbox -Identity * | Where-Object {$_.EmailAddresses -like 'smtp:user@domain.com'} | Format-List Identity, EmailAddresses
+3. Try Get-MSOLFind.ps1 in repository
 
 ----Hide mailbox address from address lists----
 Set-Mailbox -Identity $MailboxAlias -HiddenFromAddressListsEnabled $true
@@ -196,6 +198,7 @@ Set-Mailbox $User1 -ForwardingAddress $User2@domain.com -DeliverToMailboxAndForw
 
 ----Disable email forwarding----
 Set-Mailbox $userAlias -ForwardingAddress $Null
+Set-Mailbox $userAlias -DeliverToMailboxAndForward $False
 
 ----Find all Recipients (Display list) with ADMIN Forwarding or USER Forwarding----
 Get-Mailbox -ResultSize Unlimited | Where {($_.ForwardingAddress -ne $Null) -or ($_.ForwardingsmtpAddress -ne $Null)} | Select Name, ForwardingAddress, ForwardingsmtpAddress, DeliverToMailboxAndForward
@@ -238,3 +241,20 @@ Set-CalendarProcessing -Identity $Alias -AddNewRequestsTentatively:$false
 
 ----'All Personnel' Dynaic Distribution Grup----
 ((((RecipientType -eq 'UserMailbox') -and (-not(RecipientTypeDetailsValue -eq 'SharedMailbox')))) -and (-not(Name -like 'SystemMailbox{*')) -and (-not(Name -like 'CAS_{*')) -and (-not(RecipientTypeDetailsValue -eq 'MailboxPlan')) -and (-not(RecipientTypeDetailsValue -eq 'DiscoveryMailbox')) -and (-not(RecipientTypeDetailsValue -eq 'PublicFolderMailbox')) -and (-not(RecipientTypeDetailsValue -eq 'ArbitrationMailbox')) -and (-not(RecipientTypeDetailsValue -eq 'AuditLogMailbox')) -and (-not(RecipientTypeDetailsValue -eq 'AuxAuditLogMailbox')) -and (-not(RecipientTypeDetailsValue -eq 'SupervisoryReviewPolicyMailbox')))
+
+----Get a list of all Meeting Rooms----
+Get-Mailbox -RecipientTypeDetails RoomMailbox
+
+----Set the Room calendar to show the ‘Organiser’ and ‘Subject’ of the meeting----
+Set-MailboxFolderPermission -Identity $MeetingroomAlias:\calendar -User default -AccessRights LimitedDetails
+Set-CalendarProcessing -Identity $MeetingroomAlias-AddOrganizerToSubject $true -DeleteComments $false -DeleteSubject $false
+
+----Check circular logging settings on all databases----
+Get-MailboxDatabase | select name, circularloggingenabled | sort circularloggingenabled -desc | ft -AutoSize
+
+----List all databases where circular logging is enabled----
+Get-MailboxDatabase | where {$_.CircularLoggingEnabled -eq $true}
+
+----Enable Exchange circular logging----
+Set-MailboxDatabase -Identity $DatabaseName -CircularLoggingEnabled $true
+

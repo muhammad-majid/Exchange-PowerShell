@@ -115,6 +115,22 @@ Get-MailboxFolderPermission –Identity $MailboxAias:\calendar
 
 ----Add / Grant Calendar Editor permissions to UserSecretary on Mailbox of UserManager----
 Add-MailboxFolderPermission -Identity $UserManager:\calendar -user $UserSecretary -AccessRights Editor
+Set-MailboxFolderPermission –Identity $UserManager:\calendar  -user $UserSecretary -AccessRights Owner
+
+01.Owner — read, create, modify and delete all items and folders. Also this role allows manage items permissions;
+02.PublishingEditor — read, create, modify and delete items/subfolders;
+03.Editor — read, create, modify and delete items;
+04.PublishingAuthor — read, create all items/subfolders. You can modify and delete only items you create;
+05.Author — create and read items; edit and delete own items NonEditingAuthor – full read access and create items. You can delete only your own items;
+06.Reviewer — read only;
+07.Contributor — create items and folders;
+08.AvailabilityOnly — read free/busy information from calendar;
+09.LimitedDetails;
+10.None — no permissions to access folder and files.
+
+
+----Add / Grant Calendar Editor permissions WITH DELEGATION to UserSecretary on Mailbox of UserManager----
+Add-MailboxFolderPermission -Identity $UserManager:\calendar -user $UserSecretary -AccessRights Editor -SharingPermissionFlags Delegate
 
 ----Remove / Revoke Calendar permissions to UserSecretary on Mailbox of UserManager----
 Remove-MailboxFolderPermission -Identity $UserManager:\calendar -User $UserSecretary

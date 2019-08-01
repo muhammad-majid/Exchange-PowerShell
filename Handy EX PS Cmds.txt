@@ -1,10 +1,14 @@
+----Search for a mailbox---
+Get-Mailbox -filter {displayname -like "*$partOfDisplayName*"}
+Get-Mailbox -filter {displayname -like "*$partOfDisplayName*"} | fl alias
+
 ----Get all ActiveSync devices associated to a specific user----
 Get-ActiveSyncDevice -Mailbox $MailboxAlias | select FriendlyName, DeviceOS, DeviceType, DeviceModel, Identity
 Get-MobileDevice -Mailbox $MailboxAlias | select FriendlyName, DeviceOS, DeviceType, DeviceModel, Identity
 
 ----Delete all activeSync devices associated to a specific user----
 Get-ActiveSyncDevice -Mailbox $MailboxAlias | Remove-ActiveSyncDevice -WarningAction SilentlyContinue
-Get-MobileDevice -Mailbox $MailboxAlias | Remove-ActiveSyncDevice -WarningAction SilentlyContinue
+Get-MobileDevice -Mailbox $MailboxAlias | Get-MobileDevice -WarningAction SilentlyContinue
 
 ----Delete specific activeSync device associated to a specific user----	
 Remove-ActiveSyncDevice -identity $identity -WarningAction SilentlyContinue
@@ -121,12 +125,13 @@ Set-MailboxFolderPermission –Identity $UserManager:\calendar  -user $UserSecre
 02.PublishingEditor — read, create, modify and delete items/subfolders;
 03.Editor — read, create, modify and delete items;
 04.PublishingAuthor — read, create all items/subfolders. You can modify and delete only items you create;
-05.Author — create and read items; edit and delete own items NonEditingAuthor – full read access and create items. You can delete only your own items;
-06.Reviewer — read only;
-07.Contributor — create items and folders;
-08.AvailabilityOnly — read free/busy information from calendar;
-09.LimitedDetails;
-10.None — no permissions to access folder and files.
+05.Author — create and read items; edit and delete own items;
+06.NonEditingAuthor – full read access and create items. You can delete only your own items;
+07.Reviewer — read only;
+08.Contributor — create items and folders;
+09.AvailabilityOnly — read free/busy information from calendar;
+10.LimitedDetails;
+11.None — no permissions to access folder and files.
 
 
 ----Add / Grant Calendar Editor permissions WITH DELEGATION to UserSecretary on Mailbox of UserManager----
@@ -228,6 +233,9 @@ Set-MailboxFolderPermission -Identity ayla@contoso.com:\Marketing -User ed@conto
 ----Get a list of all distribution groups---
 Get-DistributionGroup
 
+----Search for a distribution groups---
+Get-DistributionGroup -filter {displayname -like "*$partOfDisplayName*"}
+
 ----Get a list of all memebers of a distribution group----
 Get-DistributionGroupMember -Identity "$DGName"
 Get-DistributionGroupMember -Identity "$DGName" | Export-Csv -NoTypeInformation 'C:\Scripts\DGMembers.csv'
@@ -241,13 +249,6 @@ Add-DistributionGroupMember -Identity "$DGName" -Member $Alias
 
 ----Remove member from a distribution group----
 Remove-DistributionGroupMember -Identity "$DGName" -Member $Alias
-
-----Get all soft deleted mailboxes and their respective GUIDs----
-Get-Mailbox -SoftDeletedMailbox
-et-MailboxDatabase | Get-MailboxStatistics | where {$_.DisconnectReason -ne $null} | ft displayname,database,disconnectreason –auto
-
-----Connect a soft deleted mailbox to an existing AD user (with no mailbox)----
-Connect-Mailbox -Identity “Mailbox Name” -Database “database name” -User AD User Name
 
 ----Disable tentative meeting requests----
 Set-CalendarProcessing -Identity $Alias -AddNewRequestsTentatively:$false
@@ -273,4 +274,27 @@ Get-MailboxDatabase | where {$_.CircularLoggingEnabled -eq $true}
 
 ----Enable Exchange circular logging----
 Set-MailboxDatabase -Identity $DatabaseName -CircularLoggingEnabled $true
+
+----Get all soft deleted mailboxes and their respective GUIDs----
+Get-Mailbox -SoftDeletedMailbox
+Get-MailboxDatabase | Get-MailboxStatistics | where {$_.DisconnectReason -ne $null} | ft displayname,database,disconnectreason –auto
+
+----Connect a soft deleted mailbox to an existing AD user (with no mailbox)----
+Connect-Mailbox -Identity “Mailbox Name” -Database “database name” -User AD User Name
+
+----Restore soft deleted user mailbox----
+Undo-SoftDeletedMailbox allieb@contoso.com -WindowsLiveID allieb@contoso.com -Password (ConvertTo-SecureString -String 'Pa$$word1' -AsPlainText -Force)
+Get-Mailbox allieb@contoso.com
+
+----Restore soft deleted shared mailbox----
+0. Try restore-SoftDeleteMbx-ToSharedMbx.ps1 as it may be simpler, if fails proceed below.
+1. Get-Mailbox -SoftDeletedMailbox | Select-Object Name,ExchangeGuid
+Note exchangeGUID from above
+2. Create a new shared mailbox
+New-Mailbox -Shared -Name $NameSharedMailbox -DisplayName $NameSharedMailbox -Alias $NameSharedMailbox
+3. Get exchangeGUID of the newly created share mailbox
+Get-Mailbox -Identity <NameOrAliasOfNewTargetMailbox> | Format-List ExchangeGuid
+4. Replace softDeletedMailboxGUID with newTargetMailboxGUID
+New-MailboxRestoreRequest -SourceMailbox <SoftDeletedMailboxGUID> -TargetMailbox <NewTargetMailboxGUID> -AllowLegacyDNMismatch
+Get-MailboxRestoreRequestStatistics -Identity adminrequests2 | Select Name, StatusDetail, TargetAlias, PercentComplete
 

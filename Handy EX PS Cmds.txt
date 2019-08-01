@@ -109,7 +109,7 @@ Add-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAcc
 Add-MailboxPermission -Identity $UserBeta -User UserAlpha -AccessRights FullAccess -Automapping $false -InheritanceType All
 
 ----Add / Grant Send as permission to UserSecretary on Mailbox of UserManager----
-Add-RecipientPermission $UserManager -Trustee $UserSecretary -AccessRights SendAs -Confirm:$False
+Add-RecipientPermission $UserManager -Trustee $UserSecretary -AccessRights SendAs
 
 ----Add / Grant Send on behalf to UserSecretary on Mailbox of UserManager----
 Set-Mailbox -Identity $UserManager -GrantSendOnBehalfTo $UserSecretary
@@ -120,6 +120,9 @@ Get-MailboxFolderPermission –Identity $MailboxAias:\calendar
 ----Add / Grant Calendar Editor permissions to UserSecretary on Mailbox of UserManager----
 Add-MailboxFolderPermission -Identity $UserManager:\calendar -user $UserSecretary -AccessRights Editor
 Set-MailboxFolderPermission –Identity $UserManager:\calendar  -user $UserSecretary -AccessRights Owner
+
+----Add / Grant Calendar Editor permissions WITH DELEGATION to UserSecretary on Mailbox of UserManager----
+Add-MailboxFolderPermission -Identity $UserManager:\calendar -user $UserSecretary -AccessRights Editor -SharingPermissionFlags Delegate
 
 01.Owner — read, create, modify and delete all items and folders. Also this role allows manage items permissions;
 02.PublishingEditor — read, create, modify and delete items/subfolders;
@@ -132,10 +135,6 @@ Set-MailboxFolderPermission –Identity $UserManager:\calendar  -user $UserSecre
 09.AvailabilityOnly — read free/busy information from calendar;
 10.LimitedDetails;
 11.None — no permissions to access folder and files.
-
-
-----Add / Grant Calendar Editor permissions WITH DELEGATION to UserSecretary on Mailbox of UserManager----
-Add-MailboxFolderPermission -Identity $UserManager:\calendar -user $UserSecretary -AccessRights Editor -SharingPermissionFlags Delegate
 
 ----Remove / Revoke Calendar permissions to UserSecretary on Mailbox of UserManager----
 Remove-MailboxFolderPermission -Identity $UserManager:\calendar -User $UserSecretary

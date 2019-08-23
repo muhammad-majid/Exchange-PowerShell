@@ -50,6 +50,10 @@ Get-Mailbox -Database $DatabaseName
 ----Get all mailboxes from a specific server----
 Get-Mailbox -Server $ServerName
 
+----Move a mailboxe to another database----
+New-MoveRequest -Identity $mailboxAlias -TargetDatabase $TargetDBName
+Get-MoveRequestStatistics -MoveRequestQueue $TargetDBName
+
 ----Move all mailboxes from 1 Database to another----
 Get-Mailbox -Database $SourceDBName -ResultSize Unlimited | New-MoveRequest -TargetDatabase $TargetDBName
 Get-MoveRequestStatistics -MoveRequestQueue “Target Database Name”
@@ -229,13 +233,16 @@ Add-MailboxFolderPermission -Identity ayla@contoso.com:\Marketing -User ed@conto
 ----Modify Folder permissions as Editor role to Ed on the Marketing folder in Ayla's mailbox.----
 Set-MailboxFolderPermission -Identity ayla@contoso.com:\Marketing -User ed@contoso.com -AccessRights Editor
 
+----Add multiple mail contacts to Exchange----
+Import-CSV C:\scripts\list.csv | ForEach-Object{ New-MailContact -Name $_.DisplayName -Alias $_.Alias -ExternalEmailAddress $_.Email -OrganizationalUnit 'OU=Contacts2,OU=Vaughans,DC=vaughans,DC=com,DC=au' }
+
 ----Get a list of all distribution groups---
 Get-DistributionGroup
 
 ----Search for a distribution groups---
 Get-DistributionGroup -filter {displayname -like "*$partOfDisplayName*"}
 
-----Get a list of all memebers of a distribution group----
+----Get a list of all members of a distribution group----
 Get-DistributionGroupMember -Identity "$DGName"
 Get-DistributionGroupMember -Identity "$DGName" | Export-Csv -NoTypeInformation 'C:\Scripts\DGMembers.csv'
 
@@ -245,6 +252,9 @@ $VarDistributionGroups
 
 ----Add member to distribution group----
 Add-DistributionGroupMember -Identity "$DGName" -Member $Alias
+
+----Add multiple members to distribution group----
+Import-CSV C:\scripts\list.csv | ForEach-Object { Add-DistributionGroupMember -Identity $DGName -Member $_.Email }
 
 ----Remove member from a distribution group----
 Remove-DistributionGroupMember -Identity "$DGName" -Member $Alias

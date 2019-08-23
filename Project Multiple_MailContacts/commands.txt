@@ -1,0 +1,31 @@
+New-MailContact -Name $DisplayName -Alias $Alias -ExternalEmailAddress $Email -OrganizationalUnit 'OU=Contacts2,OU=Vaughans,DC=vaughans,DC=com,DC=au'
+
+
+Import-CSV C:\scripts\list.csv | ForEach-Object{ New-MailContact -Name $_.DisplayName -Alias $_.Alias -ExternalEmailAddress $_.Email -OrganizationalUnit 'OU=Contacts2,OU=Vaughans,DC=vaughans,DC=com,DC=au' }
+
+
+
+
+Add to AD in right OU
+Import-Csv $Path | foreach {New-ADObject -Type Contact -Name $_.DisplayName -OtherAttributes @{'displayName'=$_.DisplayName;'mail'=$_.ExternalEmailAddress;'proxyAddresses'=$_.ExternalEmailAddress;'givenName'=$_.FirstName;'sn'=$_.LastName;'physicalDeliveryOfficeName'=$_.OfficeLocation;'telephoneNumber'=$_.TelephoneNumber;'mobile'=$_.MobileNumber;'facsimileTelephoneNumber'=$_.FaxNumber;'streetAddress'=$_.StreetAddress;'postOfficeBox'=$_.'P.O.Box';'l'=$_.City;'st'=$_.StateorProvince;'postalCode'=$_.PostalCode;'c'='AU';'Title'=$_.JobTitle;'department'=$_.Department;'company'=$_.Company} -Path "OU=$ou1,OU=$ou2,DC=$dc1,DC=$dc2,DC=$dc3"}
+
+
+
+then Add to Exchange DG
+
+
+Add to AD in right OU
+New-ADObject -type contact -path 'ou=other,ou=example,ou=contacts,DC=mydomain,DC=local' -Name "[unique name]" -otherAttributes @{'givenName'="[first name]";'sn'="[last name";'displayName'="[a display name]";'TelephoneNumber'="[theNumber]";'department'="[theDepartment]";'physicalDeliveryOfficeName'="[theOffice]";}
+
+
+
+
+
+
+brian@customairconditioning.com.au
+
+
+Import-CSV C:\scripts\list.csv | ForEach-Object { Add-DistributionGroupMember -Identity "VIC-ASubbies" -Member $_.Email }
+
+Add-DistributionGroupMember -Identity "VIC-ASubbies" -Member $Alias
+VIC-ASubbies

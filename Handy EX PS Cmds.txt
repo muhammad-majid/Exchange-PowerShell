@@ -62,7 +62,7 @@ Get-MoveRequestStatistics -MoveRequestQueue “Target Database Name”
 Get-MoveRequest -MoveStatus Completed | Remove-MoveRequest
 
 ----Disable a mailbox and delete it (without deleting the AD Account)----
-Disable-Mailbox -identity $UserNamec
+Disable-Mailbox -identity $UserName
 Remove-StoreMailbox -Database $MY_DATABASE -Identity $MY_USER -MailboxState SoftDeleted
 
 ----Permanently delete a disconnected mailbox that is in softdeleted state----
@@ -196,7 +196,7 @@ Set-Mailbox -Identity $MailboxAlias -HiddenFromAddressListsEnabled $true
 
 ----Set Out of Office Auto Reply----
 Set-MailboxAutoReplyConfiguration -Identity $MailboxAlias -AutoReplyState Enabled -InternalMessage "Internal auto-reply message." -ExternalMessage "External auto-reply message."
-Set-MailboxAutoReplyConfiguration -Identity $MailboxAlias -AutoReplyState Scheduled -StartTime "7/10/2015 08:00:00" -EndTime "7/15/2015 17:00:00" -InternalMessage "Internal auto-reply message" -ExternalMessage "External auto-reply message."
+Set-MailboxAutoReplyConfiguration -Identity $MailboxAlias -AutoReplyState Scheduled -StartTime "mm/dd/yyyy 08:00:00" -EndTime "mm/dd/yyyy 17:00:00" -InternalMessage "Internal auto-reply message" -ExternalMessage "External auto-reply message."
 Get-MailboxAutoReplyConfiguration -Identity $MailboxAlias
 
 ----Connect to Exchange O365 Administration using Powershell----
@@ -307,3 +307,8 @@ Get-Mailbox -Identity <NameOrAliasOfNewTargetMailbox> | Format-List ExchangeGuid
 New-MailboxRestoreRequest -SourceMailbox <SoftDeletedMailboxGUID> -TargetMailbox <NewTargetMailboxGUID> -AllowLegacyDNMismatch
 Get-MailboxRestoreRequestStatistics -Identity adminrequests2 | Select Name, StatusDetail, TargetAlias, PercentComplete
 
+
+----Count emails sent and received by a mailbox----
+1. $messages = Get-MessageTrace -RecipientAddress address@example.com -StartDate (Get-Date).AddDays(-1) -EndDate (Get-Date)	//dates are in mm/dd/yyyy format
+$messages.Count
+2. Use mailtraffic.ps1 script.

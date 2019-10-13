@@ -8,7 +8,7 @@ Get-MobileDevice -Mailbox $MailboxAlias | select FriendlyName, DeviceOS, DeviceT
 
 ----Delete all activeSync devices associated to a specific user----
 Get-ActiveSyncDevice -Mailbox $MailboxAlias | Remove-ActiveSyncDevice -WarningAction SilentlyContinue
-Get-MobileDevice -Mailbox $MailboxAlias | Get-MobileDevice -WarningAction SilentlyContinue
+Get-MobileDevice -Mailbox $MailboxAlias | Remove-MobileDevice -WarningAction SilentlyContinue
 
 ----Delete specific activeSync device associated to a specific user----	
 Remove-ActiveSyncDevice -identity $identity -WarningAction SilentlyContinue
@@ -301,6 +301,7 @@ Get-Mailbox allieb@contoso.com
 Note exchangeGUID from above
 2. Create a new shared mailbox
 New-Mailbox -Shared -Name $NameSharedMailbox -DisplayName $NameSharedMailbox -Alias $NameSharedMailbox
+example: New-Mailbox -Shared -Name marketing@dfkhn.com.au -DisplayName Marketing -Alias marketing
 3. Get exchangeGUID of the newly created share mailbox
 Get-Mailbox -Identity <NameOrAliasOfNewTargetMailbox> | Format-List ExchangeGuid
 4. Replace softDeletedMailboxGUID with newTargetMailboxGUID

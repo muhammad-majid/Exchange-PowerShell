@@ -308,8 +308,20 @@ Get-Mailbox -Identity <NameOrAliasOfNewTargetMailbox> | Format-List ExchangeGuid
 New-MailboxRestoreRequest -SourceMailbox <SoftDeletedMailboxGUID> -TargetMailbox <NewTargetMailboxGUID> -AllowLegacyDNMismatch
 Get-MailboxRestoreRequestStatistics -Identity adminrequests2 | Select Name, StatusDetail, TargetAlias, PercentComplete
 
+----Trace messages sent by a certain mailbox----
+Get-MessageTrace -SenderAddress $senderEmailAddress -StartDate mm/dd/yyyy -EndDate mm/dd/yyyy //dates are in mm/dd/yyyy format
 
 ----Count emails sent and received by a mailbox----
 1. $messages = Get-MessageTrace -RecipientAddress address@example.com -StartDate (Get-Date).AddDays(-1) -EndDate (Get-Date)	//dates are in mm/dd/yyyy format
 $messages.Count
 2. Use mailtraffic.ps1 script.
+
+
+----Convert a mailbox to another type----
+----Convert a resource mailbox to shared mailbox----
+Set-Mailbox $mailboxAlias -Type $newMbxType					//MBX types: Regular, Room, Equipment, Shared
+You can convert the following mailboxes from one type to another:
+User mailbox to resource (room/equipment) mailbox and vice versa
+Shared mailbox to user mailbox and vice versa
+Shared mailbox to resource (room/equipment) mailbox and vice versa
+

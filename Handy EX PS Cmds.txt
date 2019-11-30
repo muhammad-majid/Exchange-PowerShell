@@ -123,7 +123,9 @@ Get-MailboxFolderPermission –Identity $MailboxAias:\calendar
 
 ----Add / Grant Calendar Editor permissions to UserSecretary on Mailbox of UserManager----
 Add-MailboxFolderPermission -Identity $UserManager:\calendar -user $UserSecretary -AccessRights Editor
+Add-MailboxFolderPermission -Identity '$UserManager:\Deleted Items' -user $UserSecretary -AccessRights Editor
 Set-MailboxFolderPermission –Identity $UserManager:\calendar  -user $UserSecretary -AccessRights Owner
+
 
 ----Add / Grant Calendar Editor permissions WITH DELEGATION to UserSecretary on Mailbox of UserManager----
 Add-MailboxFolderPermission -Identity $UserManager:\calendar -user $UserSecretary -AccessRights Editor -SharingPermissionFlags Delegate
@@ -195,9 +197,9 @@ Move-DatabasePath $DBName -EdbFilePath 'D:\EX-Databases\DB1EX2016EISF126\DB1EX20
 Set-Mailbox -Identity $MailboxAlias -HiddenFromAddressListsEnabled $true
 
 ----Set Out of Office Auto Reply----
+Get-MailboxAutoReplyConfiguration -Identity $MailboxAlias
 Set-MailboxAutoReplyConfiguration -Identity $MailboxAlias -AutoReplyState Enabled -InternalMessage "Internal auto-reply message." -ExternalMessage "External auto-reply message."
 Set-MailboxAutoReplyConfiguration -Identity $MailboxAlias -AutoReplyState Scheduled -StartTime "mm/dd/yyyy 08:00:00" -EndTime "mm/dd/yyyy 17:00:00" -InternalMessage "Internal auto-reply message" -ExternalMessage "External auto-reply message."
-Get-MailboxAutoReplyConfiguration -Identity $MailboxAlias
 
 ----Connect to Exchange O365 Administration using Powershell----
 $UserCredential = Get-Credential
@@ -265,7 +267,7 @@ Set-CalendarProcessing -Identity $Alias -AddNewRequestsTentatively:$false
 ----List a count of folders in a mailbox----
 (Get-MailboxFolderStatistics -Identity <UPN>).Count
 
-----'All Personnel' Dynaic Distribution Grup----
+----'All Personnel' Dynamic Distribution Group----
 ((((RecipientType -eq 'UserMailbox') -and (-not(RecipientTypeDetailsValue -eq 'SharedMailbox')))) -and (-not(Name -like 'SystemMailbox{*')) -and (-not(Name -like 'CAS_{*')) -and (-not(RecipientTypeDetailsValue -eq 'MailboxPlan')) -and (-not(RecipientTypeDetailsValue -eq 'DiscoveryMailbox')) -and (-not(RecipientTypeDetailsValue -eq 'PublicFolderMailbox')) -and (-not(RecipientTypeDetailsValue -eq 'ArbitrationMailbox')) -and (-not(RecipientTypeDetailsValue -eq 'AuditLogMailbox')) -and (-not(RecipientTypeDetailsValue -eq 'AuxAuditLogMailbox')) -and (-not(RecipientTypeDetailsValue -eq 'SupervisoryReviewPolicyMailbox')))
 
 ----Get a list of all Meeting Rooms----

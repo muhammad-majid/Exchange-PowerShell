@@ -198,7 +198,7 @@ Set-Mailbox -Identity $MailboxAlias -HiddenFromAddressListsEnabled $true
 
 ----Set Out of Office Auto Reply----
 Get-MailboxAutoReplyConfiguration -Identity $MailboxAlias
-Set-MailboxAutoReplyConfiguration -Identity $MailboxAlias -AutoReplyState Enabled -InternalMessage "Internal auto-reply message." -ExternalMessage "External auto-reply message."
+Set-MailboxAutoReplyConfiguration -Identity $MailboxAlias -AutoReplyState Enabled -InternalMessage "Internal auto-reply message.<br>" -ExternalMessage "External auto-reply message.<br>"
 Set-MailboxAutoReplyConfiguration -Identity $MailboxAlias -AutoReplyState Scheduled -StartTime "mm/dd/yyyy 08:00:00" -EndTime "mm/dd/yyyy 17:00:00" -InternalMessage "Internal auto-reply message" -ExternalMessage "External auto-reply message."
 
 ----Connect to Exchange O365 Administration using Powershell----
@@ -327,3 +327,8 @@ User mailbox to resource (room/equipment) mailbox and vice versa
 Shared mailbox to user mailbox and vice versa
 Shared mailbox to resource (room/equipment) mailbox and vice versa
 
+----Check if a mailbox is Quarentined----
+Get-Mailbox | Get-MailboxStatistics | Where {$_.IsQuarantined –eq $True}
+
+----Remove a mailbox is Quarentine (Exchange 2013+ Only----
+Disable-MailboxQuarantine $mailboxAlias

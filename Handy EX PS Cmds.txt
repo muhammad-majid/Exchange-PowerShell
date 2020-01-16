@@ -332,3 +332,19 @@ Get-Mailbox | Get-MailboxStatistics | Where {$_.IsQuarantined –eq $True}
 
 ----Remove a mailbox is Quarentine (Exchange 2013+ Only----
 Disable-MailboxQuarantine $mailboxAlias
+
+----Check Mailbox Quotas----
+Get-Mailbox $MailboxAlias | Select *quota
+
+----Set Mailbox Quota limits for single user----
+Set-Mailbox $MailboxAlias -ProhibitSendQuota 20GB -ProhibitSendReceiveQuota 20GB -IssueWarningQuota 18GB
+
+----Set Mailbox Quota limits for all users in Organization----
+Get-Mailbox | Set-Mailbox $MailboxAlias -ProhibitSendQuota 20GB -ProhibitSendReceiveQuota 20GB -IssueWarningQuota 18GB
+
+----Set Mailbox Quota limits for select group----
+Get-User | where {$_.Department -eq "Sales"} | Get-Mailbox | Set-Mailbox -ProhibitSendQuota 20GB -ProhibitSendReceiveQuota 20GB -IssueWarningQuota 18GB
+
+----Enable copying of sent emails to sent items folder of shared mailbox----
+set-mailbox events -MessageCopyForSentAsEnabled $True			//for send as delegates
+set-mailbox events -MessageCopyForSendOnBehalfEnabled $True		//for send on behalf of delegates

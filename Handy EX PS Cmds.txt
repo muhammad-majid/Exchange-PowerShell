@@ -249,7 +249,7 @@ Get-DistributionGroupMember -Identity "$DGName"
 Get-DistributionGroupMember -Identity "$DGName" | Export-Csv -NoTypeInformation 'C:\Scripts\DGMembers.csv'
 
 ----Get a list of all Distribution Groups a user is a memeber of----
-$VarDistributionGroups = Get-DistributionGroup | where { (Get-DistributionGroupMember $_.Name | foreach {$_.PrimarySmtpAddress}) -contains $Alias}
+$VarDistributionGroups = Get-DistributionGroup | where { (Get-DistributionGroupMember $_.Name | foreach {$_.PrimarySmtpAddress}) -contains '$Alias'}
 $VarDistributionGroups
 
 ----Add member to distribution group----

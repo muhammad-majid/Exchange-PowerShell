@@ -50,7 +50,7 @@ Get-Mailbox -Database $DatabaseName
 ----Get all mailboxes from a specific server----
 Get-Mailbox -Server $ServerName
 
-----Move a mailboxe to another database----
+----Move a mailbox to another database----
 New-MoveRequest -Identity $mailboxAlias -TargetDatabase $TargetDBName
 Get-MoveRequestStatistics -MoveRequestQueue $TargetDBName
 
@@ -110,7 +110,7 @@ Remove-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights Full
 Add-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -InheritanceType All
 
 ----Add / Grant Permission and Access Rights to UserAlpha on Mailbox of UserBeta with automapping off----
-Add-MailboxPermission -Identity $UserBeta -User UserAlpha -AccessRights FullAccess -Automapping $false -InheritanceType All
+Add-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -Automapping $false -InheritanceType All
 
 ----Add / Grant Send as permission to UserSecretary on Mailbox of UserManager----
 Add-RecipientPermission $UserManager -Trustee $UserSecretary -AccessRights SendAs
@@ -208,6 +208,10 @@ Import-PSSession $Session
 //do your work.....
 Get-PSSession
 Remove-PSSession $SessionID // or the session id
+
+----Connect to Exchange O365 Administration using Powershell with MFA----
+Get the Exchange Online PowerShell module for MFA installed first (using IE or Edge ONLY)
+Connect-EXOPSSession
 
 ----Change display name and others on Exchange O365 Powershell----
 Get-Mailbox $MailboxAlias | Set-Mailbox -Name "Sunset Room" -Alias "sunsetroom" -DisplayName "Sunset Room" -SamAccountName sunsetroom -UserPrincipalName sunsetroom@exchangeserverpro.net

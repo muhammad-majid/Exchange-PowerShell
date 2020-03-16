@@ -1,6 +1,7 @@
 ----Search for a mailbox---
 Get-Mailbox -filter {displayname -like "*$partOfDisplayName*"}
 Get-Mailbox -filter {displayname -like "*$partOfDisplayName*"} | fl alias
+Get-Mailbox $mailboxAlias | fl emailaddresses
 
 ----Get all ActiveSync devices associated to a specific user----
 Get-ActiveSyncDevice -Mailbox $MailboxAlias | select FriendlyName, DeviceOS, DeviceType, DeviceModel, Identity
@@ -352,3 +353,15 @@ Get-User | where {$_.Department -eq "Sales"} | Get-Mailbox | Set-Mailbox -Prohib
 ----Enable copying of sent emails to sent items folder of shared mailbox----
 set-mailbox events -MessageCopyForSentAsEnabled $True			//for send as delegates
 set-mailbox events -MessageCopyForSendOnBehalfEnabled $True		//for send on behalf of delegates
+
+----Bulk upload profile pictures to O365----
+Contents of pic.csv:
+username,picture
+user1,C:\photos\user1.jpg
+user2,C:\photos\user2.jpg
+user3,C:\photos\user3.jpg
+
+ExSession = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/?proxymethod=rps -Credential $MSOLCred -Authentication Basic -AllowRedirection
+Import-PSSession $ExSession
+Import-csv c:\scripts\pic.csv | % { Set-UserPhoto –Identity $_.username -PictureData ([System.IO.File]::ReadAllBytes($_.picture)) -Confirm:$false}
+

@@ -107,10 +107,10 @@ Get-Mailbox -ResultSize Unlimited | Get-MailboxPermission | where {$_.user.tostr
 ----Remove all Permission and Access Rights of UserAlpha that he has on Mailbox of UserBeta----
 Remove-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -InheritanceType All
 
-----Add / Grant Permission and Access Rights to UserAlpha on Mailbox of UserBeta----
+----Add / Grant Permission and Access Rights to UserAlpha (secretary) on Mailbox of UserBeta (manager)----
 Add-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -InheritanceType All
 
-----Add / Grant Permission and Access Rights to UserAlpha on Mailbox of UserBeta with automapping off----
+----Add / Grant Permission and Access Rights to UserAlpha (secretary) on Mailbox of UserBeta (manager) with automapping off----
 Add-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -Automapping $false -InheritanceType All
 
 ----Add / Grant Send as permission to UserSecretary on Mailbox of UserManager----

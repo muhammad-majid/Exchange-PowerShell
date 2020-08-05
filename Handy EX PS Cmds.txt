@@ -104,17 +104,14 @@ Get-MailboxPermission -identity $MailboxAlias | Export-Csv -NoTypeInformation ma
 ----List of all mailboxes where other users have permissions to access them----
 Get-Mailbox -ResultSize Unlimited | Get-MailboxPermission | where {$_.user.tostring() -ne "NT AUTHORITY\SELF" -and $_.IsInherited -eq $false} | Select Identity,User,@{Name='Access Rights';Expression={[string]::join(', ', $_.AccessRights)}} | Export-Csv -NoTypeInformation mailboxpermissions.csv
 
-----Remove all Permission and Access Rights of UserAlpha that he has on Mailbox of UserBeta----
+----Add / Remove Permission and Access Rights to UserAlpha (secretary) on Mailbox of UserBeta (manager)----
+Add-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -InheritanceType All
+Add-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -Automapping $false -InheritanceType All
 Remove-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -InheritanceType All
 
-----Add / Grant Permission and Access Rights to UserAlpha on Mailbox of UserBeta----
-Add-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -InheritanceType All
-
-----Add / Grant Permission and Access Rights to UserAlpha on Mailbox of UserBeta with automapping off----
-Add-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -Automapping $false -InheritanceType All
-
-----Add / Grant Send as permission to UserSecretary on Mailbox of UserManager----
+----Add / Remove Send as permission to UserSecretary on Mailbox of UserManager----
 Add-RecipientPermission $UserManager -Trustee $UserSecretary -AccessRights SendAs
+Remove-RecipientPermission $UserManager -Trustee $UserSecretary -AccessRights SendAs
 
 ----Add / Grant Send on behalf to UserSecretary on Mailbox of UserManager----
 Set-Mailbox -Identity $UserManager -GrantSendOnBehalfTo $UserSecretary
@@ -126,7 +123,6 @@ Get-MailboxFolderPermission –Identity $MailboxAias:\calendar
 Add-MailboxFolderPermission -Identity $UserManager:\calendar -user $UserSecretary -AccessRights Editor
 Add-MailboxFolderPermission -Identity '$UserManager:\Deleted Items' -user $UserSecretary -AccessRights Editor
 Set-MailboxFolderPermission –Identity $UserManager:\calendar  -user $UserSecretary -AccessRights Owner
-
 
 ----Add / Grant Calendar Editor permissions WITH DELEGATION to UserSecretary on Mailbox of UserManager----
 Add-MailboxFolderPermission -Identity $UserManager:\calendar -user $UserSecretary -AccessRights Editor -SharingPermissionFlags Delegate
@@ -365,3 +361,19 @@ ExSession = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri h
 Import-PSSession $ExSession
 Import-csv c:\scripts\pic.csv | % { Set-UserPhoto –Identity $_.username -PictureData ([System.IO.File]::ReadAllBytes($_.picture)) -Confirm:$false}
 
+----Get all shared maiboxes and their members----
+Get-Mailbox -RecipientTypeDetails SharedMailbox -ResultSize:Unlimited | Get-MailboxPermission | select identity,user,accessrights | where { ($_.User -like '*@*') } | Export-CSV C:\Scripts\3B.SharedMailboxesMembers.csv
+
+----Install Exchange Online EXO v2 module----
+Install-Module -Name ExchangeOnlineManagement
+Update-Module -Name ExchangeOnlineManagement
+
+----Check  Exchange Online EXO v2 module version----
+Import-Module ExchangeOnlineManagement; Get-Module ExchangeOnlineManagement
+
+----Uninstall Exchange Online EXO v2 module----
+Uninstall-Module -Name ExchangeOnlineManagement
+
+----Connect Exchange Online EXO v2 with MFA----
+Connect-ExchangeOnline -Credential $UserCredential -ShowProgress $true		//for none MFA
+Connect-ExchangeOnline -UserPrincipalName <UPN> -ShowProgress $true			//for MFA

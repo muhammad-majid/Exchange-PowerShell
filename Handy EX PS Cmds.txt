@@ -104,8 +104,13 @@ Get-MailboxPermission -identity $MailboxAlias | Export-Csv -NoTypeInformation ma
 ----List of all mailboxes where other users have permissions to access them----
 Get-Mailbox -ResultSize Unlimited | Get-MailboxPermission | where {$_.user.tostring() -ne "NT AUTHORITY\SELF" -and $_.IsInherited -eq $false} | Select Identity,User,@{Name='Access Rights';Expression={[string]::join(', ', $_.AccessRights)}} | Export-Csv -NoTypeInformation mailboxpermissions.csv
 
-----Add / Remove Permission and Access Rights to UserAlpha (secretary) on Mailbox of UserBeta (manager)----
+----Remove all Permission and Access Rights of UserAlpha that he has on Mailbox of UserBeta----
+Remove-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -InheritanceType All
+
+----Add / Grant Permission and Access Rights to UserAlpha (secretary) on Mailbox of UserBeta (manager)----
 Add-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -InheritanceType All
+
+----Add / Grant Permission and Access Rights to UserAlpha (secretary) on Mailbox of UserBeta (manager) with automapping off----
 Add-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -Automapping $false -InheritanceType All
 Remove-MailboxPermission -Identity $UserBeta -User $UserAlpha -AccessRights FullAccess -InheritanceType All
 
